@@ -1,0 +1,52 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  bookings  Booking[]
+}
+
+model Hotel {
+  id       String    @id @default(uuid())
+  name     String
+  location String
+  bookings Booking[]
+}
+
+model Booking {
+  id           String       @id @default(uuid())
+  userId       String
+  hotelId      String
+  checkInDate  DateTime
+  checkOutDate DateTime
+  totalGuests  Int
+  user         User         @relation(fields: [userId], references: [id])
+  hotel        Hotel        @relation(fields: [hotelId], references: [id])
+  WebCheckIn   WebCheckIn[]
+}
+
+model WebCheckIn {
+  id            String         @id @default(uuid())
+  bookingId     String
+  booking       Booking        @relation(fields: [bookingId], references: [id])
+  familyMembers FamilyMember[]
+}
+
+model FamilyMember {
+  id            String     @id @default(uuid())
+  webCheckInId  String
+  name          String
+  aadhaarNumber String
+  relationship  String
+  webCheckIn    WebCheckIn @relation(fields: [webCheckInId], references: [id])
+}
